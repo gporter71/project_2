@@ -37,6 +37,15 @@ public class Conversion{
         }
         
         
+        System.out.println("testing my delete function");
+        StringBuffer z = new StringBuffer("asdf");
+        StringBuffer a = substituteCharacter(z,1,'d');
+        
+        
+
+        System.out.println(z);
+        System.out.println(a);
+        
         
         ArrayList<Integer> weights = new ArrayList<>();
         ArrayList<String> weightStrings = new ArrayList<>();
@@ -54,14 +63,14 @@ public class Conversion{
         
         //System.out.println(str2.replace(2,3, "R"));
         
-        lowestMinimum = minEditDistance(str,str2,strM,0,0,999,999,999,999);
+        //lowestMinimum = minEditDistance(str,str2,strM,0,0,999,999,999,999);
         
         
         
         System.out.println("The minimum edit Distance is: " + lowestMinimum);
         
         //System.out.println(stringEquals(str,str2));
-        System.out.println(str.charAt(0));
+        //System.out.println(str.charAt(0));
         
         
         
@@ -156,7 +165,39 @@ public class Conversion{
     
     
     //find the minimum edit distance between two strings
-    public static int minEditDistance(StringBuffer str, StringBuffer str2, StringBuffer str0, int currentIndex, int currentDis,int cb,int db, int ib, int sb){
+    public static int minEditDistance(StringBuffer str, StringBuffer str2, StringBuffer str0, int currentIndex, int currentDis){
+        int dif = whichIsLonger(str,str2);
+        
+        if(currentDis > lowestMinimum){
+            return -1;
+        }
+        
+        
+        if(dif == 0){
+            //Strings are of equal length
+            if(stringEquals(str0,str2) && stringEquals(str,str2)){
+                System.out.println("the string matches target string");
+                    return currentDis;
+                
+            }
+            if(Character.toLowerCase(str.charAt(currentIndex)) == Character.toLowerCase(str2.charAt(currentIndex))){
+                //Copy value from str2 to str0
+                minEditDistance(str,str2,str0,currentIndex + 1, currentDis + c);
+            }
+            minEditDistance(removeCharacter(str,currentIndex),str2,str0,currentIndex,currentDis);
+        }
+        if(dif == -1){
+            System.out.println("first str is shorter");
+            
+            
+        }
+        if(dif == 1){
+            System.out.println("first string is longer");
+            
+        }
+        return 0;
+        
+        /**
         recN++;
         System.out.println("\nthis is recursion is number: " + recN + " with string: " + str0 + " at index: " + currentIndex);
         
@@ -192,7 +233,7 @@ public class Conversion{
         if(str2.length() < str.length()){
             System.out.println("\nentering delete branch");
             StringBuffer strAux = new StringBuffer((str.deleteCharAt(currentIndex).toString()));
-            deleteBranch = minEditDistance(strAux,str2,str0,currentIndex,currentDis + d,cb,db,ib,sb);
+            deleteBranch = minEditDistance(removeCharacter(str,currentIndex),str2,str0,currentIndex,currentDis + d,cb,db,ib,sb);
             
         }
         
@@ -202,7 +243,7 @@ public class Conversion{
             System.out.println("current index: " + currentIndex + " str length " + str.length() + " str2 length " + str2.length());
             if(currentIndex < str.length() && currentIndex < str2.length()){
                 StringBuffer strAux = new StringBuffer((str0.insert(currentIndex,str2.charAt(currentIndex))).toString());
-                insertBranch = minEditDistance(str,str2,strAux,currentIndex + 1, currentDis + i,cb,db,ib,sb);
+                insertBranch = minEditDistance(str,str2,insertCharacter(str0,currentIndex,str2.charAt(currentIndex)),currentIndex + 1, currentDis + i,cb,db,ib,sb);
             }
         }
         System.out.println(currentIndex);
@@ -218,6 +259,8 @@ public class Conversion{
         
         
         return x;
+        
+        **/
         
     }
     
@@ -270,6 +313,51 @@ public class Conversion{
             
         }
         return distances.get(i);
+    }
+    public static StringBuffer insertCharacter(StringBuffer str, int x, char y){
+        int i =0;
+        StringBuffer s = new StringBuffer("");
+        while(i < str.length()){
+            System.out.println(i);
+            if(i == x){
+                s.append(Character.toString(y));
+            }
+            s.append(Character.toString(str.charAt(i)));
+            i++;
+        }
+        return s;
+    }
+    
+    public static StringBuffer substituteCharacter(StringBuffer str, int x, char c)
+    {
+        StringBuffer s = insertCharacter(str,x,c);
+        s = removeCharacter(s, x+1);
+        return s;
+    }
+    public static StringBuffer appendCharacter(StringBuffer str, char x){
+        int i = 0;
+        StringBuffer s = new StringBuffer("");
+        while(i < str.length()){
+            s.append(Character.toString(str.charAt(i)));
+            i++;
+        }
+        s.append(Character.toString(x));
+        return s;
+    }
+    
+    public static StringBuffer removeCharacter(StringBuffer str, int x){
+        int i = 0;
+        StringBuffer s = new StringBuffer("");
+        while(i < str.length()){
+            System.out.println(i);
+            if(i == x){
+                i++;
+            }
+            s.append(Character.toString(str.charAt(i)));
+            i++;
+        }
+        return s;
+        
     }
     
     public static void readData(Scanner reader){
