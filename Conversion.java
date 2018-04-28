@@ -25,7 +25,6 @@ public class Conversion{
     
     public static void main(String args[]) throws FileNotFoundException
     {
-        System.out.println("test");
         
         if(args.length > 0){
             Scanner reader = new Scanner(new FileInputStream(args[0]));
@@ -37,23 +36,14 @@ public class Conversion{
         }
         
         
-        System.out.println("testing my delete function");
-        StringBuffer z = new StringBuffer("asdf");
-        StringBuffer a = substituteCharacter(z,1,'d');
-        
-        
-
-        System.out.println(z);
-        System.out.println(a);
-        
-        
-        ArrayList<Integer> weights = new ArrayList<>();
-        ArrayList<String> weightStrings = new ArrayList<>();
-        
 
         
-        StringBuffer str = new StringBuffer("L");
-        StringBuffer str2 = new StringBuffer("A");
+        StringBuffer str = new StringBuffer("CRAZY");
+        StringBuffer str2 = new StringBuffer("YZAZRC");
+        
+        StringBuffer a = new StringBuffer(str.toString());
+        StringBuffer b = new StringBuffer(str2.toString());
+        
         StringBuffer str0 = new StringBuffer("");
         StringBuffer strM = new StringBuffer("");
         
@@ -61,20 +51,20 @@ public class Conversion{
         
         lowestMinimum = getADistance(str,str2,str0,0,0);
         
-        //System.out.println(str2.replace(2,3, "R"));
-        
-        //lowestMinimum = minEditDistance(str,str2,strM,0,0,999,999,999,999);
-        
-        
-        
-        System.out.println("The minimum edit Distance is: " + lowestMinimum);
-        
-        //System.out.println(stringEquals(str,str2));
-        //System.out.println(str.charAt(0));
-        
-        
+        System.out.println("The temp min distance is: " + lowestMinimum);
+        System.out.println("Str: " + a + "str2: " + b);
+        int x = minEditDistance(a,b,strM,0,0);
+        if(x > lowestMinimum){
+            System.out.println("The minimum edit Distance is: " + lowestMinimum);
+        }
+        else{
+            lowestMinimum = x;
+            System.out.println("The minimum edit Distance is: " + lowestMinimum);
+        }
         
         
+        
+    
     }
     
     //read in input from a file
@@ -166,36 +156,168 @@ public class Conversion{
     
     //find the minimum edit distance between two strings
     public static int minEditDistance(StringBuffer str, StringBuffer str2, StringBuffer str0, int currentIndex, int currentDis){
+        System.out.println("New Recursion : Value of str0: " + str0);
+        //System.out.println(str + " " + str2 + " " + str0 + " " + currentIndex + " " + currentDis);
+        StringBuffer stringA = new StringBuffer(str0.toString());
+        StringBuffer stringB = new StringBuffer(str0.toString());
+        StringBuffer stringC = new StringBuffer(str0.toString());
+        
         int dif = whichIsLonger(str,str2);
+        //System.out.println(dif);
+        int copyBranch = 999;
+        int deleteBranch = 999;
+        int substituteBranch = 999;
+        int insertBranch = 999;
         
         if(currentDis > lowestMinimum){
             return -1;
         }
-        
+        if(currentIndex > str.length() && currentIndex > str2.length()){
+            return currentDis;
+        }
+        if(stringEquals(str2,str0)){
+            return currentDis;
+        }
         
         if(dif == 0){
             //Strings are of equal length
             if(stringEquals(str0,str2) && stringEquals(str,str2)){
                 System.out.println("the string matches target string");
-                    return currentDis;
+                lowestMinimum = currentDis;
+                return currentDis;
                 
             }
-            if(Character.toLowerCase(str.charAt(currentIndex)) == Character.toLowerCase(str2.charAt(currentIndex))){
-                //Copy value from str2 to str0
-                minEditDistance(str,str2,str0,currentIndex + 1, currentDis + c);
+            if(currentIndex < str.length() && currentIndex < str2.length()){
+                if(Character.toLowerCase(str.charAt(currentIndex)) == Character.toLowerCase(str2.charAt(currentIndex))){
+                    //Copy value from str2 to str0
+                    copyBranch = minEditDistance(str,str2,insertCharacter(str0,currentIndex,str2.charAt(currentIndex)),currentIndex + 1, currentDis + c);
+                }else{
+                    insertBranch = minEditDistance(str,str2,insertCharacter(str0,currentIndex,str2.charAt(currentIndex)),currentIndex,currentDis + i);
+                    
+                    if(str.length() >= 1){
+                        //delete char at currentIndex
+                        deleteBranch = minEditDistance(str,str2,makeCopy(str0),currentIndex,currentDis + d);
+                    }
+                    System.out.println("currentIndex:" + currentIndex + " str2:" + str2 + " str0:" + str0);
+                    substituteBranch = minEditDistance(str,str2,appendCharacter(str0,str2.charAt(currentIndex)),currentIndex+1,currentDis + s);
+                    
+                }
             }
-            minEditDistance(removeCharacter(str,currentIndex),str2,str0,currentIndex,currentDis);
+
+            
+            
         }
         if(dif == -1){
-            System.out.println("first str is shorter");
-            
-            
+
+            if(currentIndex < str.length() && currentIndex < str2.length()){
+                if(Character.toLowerCase(str.charAt(currentIndex)) == Character.toLowerCase(str2.charAt(currentIndex))){
+                    //Copy value from str2 to str0
+                    copyBranch = minEditDistance(str,str2,str0.append(str.charAt(currentIndex)),currentIndex + 1, currentDis + c);
+                }
+                else{
+                    //deleteBranch = minEditDistance(str,str2,makeCopy(str0),currentIndex,currentDis);
+                    //substituteBranch = minEditDistance(str,str2,appendCharacter(str0,str2.charAt(currentIndex)),currentIndex+1,currentDis + s);
+                    
+                    StringBuffer strTemp = new StringBuffer(str0.toString());
+                    deleteBranch = minEditDistance(str,str2,str0.append(str.charAt(currentIndex+1)),currentIndex,currentDis + d);
+                    System.out.println("After Delete: " + str + " " + str2 + " " + str0);
+                    stringB = insertCharacter(str0,currentIndex,str2.charAt(currentIndex));
+                    
+                    if(deleteBranch == -1 || deleteBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return deleteBranch;
+                    }
+                    
+                    insertBranch = minEditDistance(str,str2,str0,currentIndex,currentDis + i);
+                    System.out.println("After Insert: " + str + " " + str2 + " " + str0);
+                    if(insertBranch == -1 || insertBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return insertBranch;
+                    }
+                    
+                    stringC = appendCharacter(str0,str2.charAt(currentIndex));
+                    substituteBranch = minEditDistance(str,str2,str0,currentIndex+1,currentDis + s);
+                    
+                    if(substituteBranch == -1 || substituteBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return substituteBranch;
+                    }
+                    System.out.println("After Sub: " + str + " " + str2 + " " + str0);
+                    
+
+                }
+                
+            }
+     
+        else{
+            insertBranch = minEditDistance(str,str2,insertCharacter(str0,currentIndex,str2.charAt(currentIndex)),currentIndex,currentDis + i);
         }
+    }
         if(dif == 1){
-            System.out.println("first string is longer");
-            
+            //System.out.println("first string is longer");
+            if(currentIndex < str.length() && currentIndex < str2.length()){
+                if(Character.toLowerCase(str.charAt(currentIndex)) == Character.toLowerCase(str2.charAt(currentIndex))){
+                    
+                    //Copy value from str2 to str0
+                    
+                    System.out.println("Copies Value: " + str.charAt(currentIndex));
+                    copyBranch = minEditDistance(str,str2,str0.append(str.charAt(currentIndex)),currentIndex + 1, currentDis + c);
+                }
+                else{
+                    
+                    
+                
+                System.out.println("should delete Value");
+                    
+                    StringBuffer strTemp = new StringBuffer(str0.toString());
+                deleteBranch = minEditDistance(str,str2,str0.append(str.charAt(currentIndex+1)),currentIndex,currentDis + d);
+                    System.out.println("After Delete: " + str + " " + str2 + " " + str0);
+                    stringB = insertCharacter(str0,currentIndex,str2.charAt(currentIndex));
+                    
+                    if(deleteBranch == -1 || deleteBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return deleteBranch;
+                    }
+                    
+                insertBranch = minEditDistance(str,str2,str0,currentIndex,currentDis + i);
+                    System.out.println("After Insert: " + str + " " + str2 + " " + str0);
+                    if(insertBranch == -1 || insertBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return insertBranch;
+                    }
+                    
+                    stringC = appendCharacter(str0,str2.charAt(currentIndex));
+                substituteBranch = minEditDistance(str,str2,str0,currentIndex+1,currentDis + s);
+                    
+                    if(substituteBranch == -1 || substituteBranch == 999){
+                        str0 = strTemp;
+                    }
+                    else{
+                        return substituteBranch;
+                    }
+                    System.out.println("After Sub: " + str + " " + str2 + " " + str0);
+
+                }
+            }
+            else{
+                deleteBranch = minEditDistance(str,str2,makeCopy(str0),currentIndex,currentDis + d);
+            }
+          
         }
-        return 0;
+        //System.out.println("Values of branches: " +  " " + copyBranch +  " " + deleteBranch + " " + insertBranch + " " + substituteBranch);
+        int x = findSmallestIgnoreInvalid(copyBranch,deleteBranch,insertBranch,substituteBranch);
+        return x;
+        
         
         /**
         recN++;
@@ -263,19 +385,22 @@ public class Conversion{
         **/
         
     }
-    
+    public static StringBuffer makeCopy(StringBuffer s){
+        StringBuffer str = new StringBuffer(s.toString());
+        return str;
+    }
     
     public static int whichIsLonger(StringBuffer str, StringBuffer str2){
         int x = -2;
         if(str.length() < str2.length()){
             x = -1;
-        }
-        if(str.length() == str2.length()){
+        }else if(str.length() == str2.length()){
             x = 0;
         }
-        if(str.length() > str2.length()){
+        else{
             x = 1;
         }
+        //System.out.println(str + " " + str2);
         return x;
     }
            
@@ -318,7 +443,7 @@ public class Conversion{
         int i =0;
         StringBuffer s = new StringBuffer("");
         while(i < str.length()){
-            System.out.println(i);
+            
             if(i == x){
                 s.append(Character.toString(y));
             }
@@ -348,13 +473,20 @@ public class Conversion{
     public static StringBuffer removeCharacter(StringBuffer str, int x){
         int i = 0;
         StringBuffer s = new StringBuffer("");
+        if(str.length() == 1){
+            return s;
+        }
         while(i < str.length()){
-            System.out.println(i);
             if(i == x){
                 i++;
             }
-            s.append(Character.toString(str.charAt(i)));
-            i++;
+            if(i >= str.length()){
+                return s;
+            }
+            else{
+                s.append(Character.toString(str.charAt(i)));
+                i++;
+            }
         }
         return s;
         
@@ -369,8 +501,8 @@ public class Conversion{
             d = reader.nextInt();
             i = reader.nextInt();
             s = reader.nextInt();
-            System.out.println(word);
-            System.out.println(eDis);
+            //System.out.println(word);
+            //System.out.println(eDis);
             while(reader.hasNext()){
                 //System.out.println(reader.next());
                 body.append(reader.next());
